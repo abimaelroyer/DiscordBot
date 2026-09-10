@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  launchd agent for the unattended AlgoTrader runner.
+
+  Install (per-user; runs in your login session so it can reach the Keychain
+  where Claude Code stored the Robinhood OAuth token):
+
+    cp "launchd/com.algotrader.agent.plist" ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.algotrader.agent.plist
+    launchctl enable gui/$(id -u)/com.algotrader.agent
+
+  It fires every 5 minutes (one per 5-minute candle); run_agent.sh no-ops
+  outside US market hours.
+  It starts in DRY-RUN (no orders). To go live, add ALGOTRADER_LIVE=1 to
+  EnvironmentVariables below, then re-bootstrap (bootout, then bootstrap).
+
+  Stop / remove:
+    launchctl bootout gui/$(id -u)/com.algotrader.agent
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.algotrader.agent</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/nathan/AlgoTrader/run_agent.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/nathan/AlgoTrader</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/nathan/.local/bin:/Users/nathan/.pyenv/shims:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <!-- To enable live trading, uncomment:
+        <key>ALGOTRADER_LIVE</key>
+        <string>1</string>
+        -->
+    </dict>
+
+    <key>StartInterval</key>
+    <integer>300</integer>
+
+    <!-- Run once immediately on (re)load so you get an instant "bot is on"
+         confirmation (it no-ops silently if the market is closed). -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/nathan/AlgoTrader/state/agent/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/nathan/AlgoTrader/state/agent/launchd.err.log</string>
+</dict>
+</plist>

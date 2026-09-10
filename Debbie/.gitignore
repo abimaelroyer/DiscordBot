@@ -1,0 +1,17 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+__pycache__/
+
+# Credentials / Environment files
+.env
+
+# Local run script with plaintext credentials — never commit
+start_bot.sh
